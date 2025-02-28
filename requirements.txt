@@ -1,0 +1,8 @@
+# Staples
+jupyter==1.1.1
+
+# Development
+pandas==2.2.3
+
+# Additional
+plotly==6.0.0
