@@ -1,5 +1,5 @@
 # dynamic-rythms
-This is a repo focused to solve the dynamic-rythms contest.
+This is a repo focused to solve the [dynamic-rythms contest]().
 
 ## Contest Summary
 
