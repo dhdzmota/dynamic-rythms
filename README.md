@@ -1,6 +1,6 @@
 # dynamic-rythms
 This is a repo focused to solve the [dynamic-rythms contest]().
-
+![](assets/images/dynamic-rhythms.png)
 ## Contest Summary
 
 ### Objective
@@ -41,4 +41,4 @@ Open feb 5, 2025. Closes May 1, 2025. Winners Announcement: 13 june 2025.
 The raw data path should look like this: `data/raw/dynamic-rhythms-train-data`. With additional folders inside.
 3. Go to the root of the project, and pip install the requirements using the following command: `pip install -r requirements.txt`.
 4. Execute the python script with the following command: `python general_pipeline.py`
-5. Wait until everythings unfolds.
+5. Wait until everything unfolds.
