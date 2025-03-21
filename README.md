@@ -34,3 +34,11 @@ Solution Clarity & Reproducibility (10%):
 
 ## Important dates:
 Open feb 5, 2025. Closes May 1, 2025. Winners Announcement: 13 june 2025.
+
+## Steps to run this project:
+1. After cloning this repo, you should download the information from the contest and introduce it into `data/raw` folder
+2. Extract the information from the zip file `dynamic-rhythms-train-data.zip` into a normal folder 'dynamic-rhythms-train-data.zip'.
+The raw data path should look like this: `data/raw/dynamic-rhythms-train-data`. With additional folders inside.
+3. Go to the root of the project, and pip install the requirements using the following command: `pip install -r requirements.txt`.
+4. Execute the python script with the following command: `python general_pipeline.py`
+5. Wait until everythings unfolds.
