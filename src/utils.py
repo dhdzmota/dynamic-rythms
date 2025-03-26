@@ -1,5 +1,7 @@
 import geopandas as gpd
+import json
 import os
+import pandas as pd
 import yaml
 import pickle
 
@@ -69,6 +71,18 @@ def get_config_file():
         config = yaml.safe_load(f)
     return config
 
+def get_parameters_file():
+    """Access the parameters file with the params definitions"""
+    general_path = get_general_path()
+    params_path = join_paths(general_path, 'config','POWER_Parameter_Manager.csv')
+    params = pd.read_csv(params_path, engine='python', header=1).head(20).to_dict()['Parameter(s):']
+    return params
+
+def key_list(dictionary):
+    """Get the keys of a dictionary as a list"""
+    key_list_dict = list(dictionary.keys())
+    return key_list_dict
+
 
 def save_shapefile_from_url_zip(url, save_data_path):
     """From a URL, that downloads a zip file containing shp files, download the info and
@@ -102,3 +116,8 @@ def save_info(main_file, filepath):
         save_dataframe(filepath=filepath, dataframe=city_data)
     else:
         print(f'Information is already saved at: {filepath}')
+
+def save_as_json(what, where):
+    if not check_if_filepath_exists(where):
+        with open(where, 'w') as f:
+            json.dump(what, f)
