@@ -1,4 +1,4 @@
-import utils as utils
+import src.utils as utils
 
 CITY_URL_KEY = 'CITY_URL_SHAPEFILE'
 COUNTY_URL_KEY = 'COUNTY_URL_SHAPEFILE'

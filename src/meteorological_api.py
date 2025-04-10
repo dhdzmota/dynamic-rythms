@@ -1,9 +1,13 @@
 import json
 import pandas as pd
 import requests
+import time
 
-import utils
+import src.utils as utils
+
 METEOROLOGICAL_API_KEY = 'METEOROLOGICAL_API_URL'
+config = utils.get_config_file()  # Bottleneck
+parameters = utils.get_parameters_file()  # Bottleneck
 
 
 def get_api_url(lat, lon, datetime_start, datetime_end, temporality='hourly'):
@@ -17,9 +21,6 @@ def get_api_url(lat, lon, datetime_start, datetime_end, temporality='hourly'):
     :return:
         url: Formated string of the API url.
     """
-    config = utils.get_config_file() # Bottleneck
-    parameters = utils.get_parameters_file() # Bottleneck
-
     start = pd.to_datetime(datetime_start).strftime('%Y%m%d')
     end = pd.to_datetime(datetime_end).strftime('%Y%m%d')
     base_url = config[METEOROLOGICAL_API_KEY]
@@ -40,6 +41,7 @@ def get_api_url(lat, lon, datetime_start, datetime_end, temporality='hourly'):
 def get_meteorological_info(url):
     text_information = requests.get(url).text
     formated_text_information = json.loads(text_information)
+    time.sleep(1)
     return formated_text_information
 
 
