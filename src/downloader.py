@@ -1,3 +1,7 @@
+'''
+This main script looks to download from their corresponding links the CITY and COUNTY dataframes.
+'''
+
 import src.utils as utils
 
 CITY_URL_KEY = 'CITY_URL_SHAPEFILE'
@@ -53,7 +57,7 @@ def download_meteorological_info():
 
 
 def download():
-    download_cities()
+    #download_cities()
     download_counties()
     # download_meteorological_info()
     pass

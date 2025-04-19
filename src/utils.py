@@ -9,6 +9,63 @@ from io import BytesIO
 from urllib.request import urlopen
 from zipfile import ZipFile
 
+CUSTOMERS_OUT_NB = 10**3.5 # 10**3.5
+STATE_ABBREVIATIONS = {
+    'Alabama': 'AL',
+    'Alaska': 'AK',
+    'Arizona': 'AZ',
+    'Arkansas': 'AR',
+    'California': 'CA',
+    'Colorado': 'CO',
+    'Connecticut': 'CT',
+    'Delaware': 'DE',
+    'District of Columbia': 'DC',
+    'Florida': 'FL',
+    'Georgia': 'GA',
+    'Hawaii': 'HI',
+    'Idaho': 'ID',
+    'Illinois': 'IL',
+    'Indiana': 'IN',
+    'Iowa': 'IA',
+    'Kansas': 'KS',
+    'Kentucky': 'KY',
+    'Louisiana': 'LA',
+    'Maine': 'ME',
+    'Maryland': 'MD',
+    'Massachusetts': 'MA',
+    'Michigan': 'MI',
+    'Minnesota': 'MN',
+    'Mississippi': 'MS',
+    'Missouri': 'MO',
+    'Montana': 'MT',
+    'Nebraska': 'NE',
+    'Nevada': 'NV',
+    'New Hampshire': 'NH',
+    'New Jersey': 'NJ',
+    'New Mexico': 'NM',
+    'New York': 'NY',
+    'North Carolina': 'NC',
+    'North Dakota': 'ND',
+    'Ohio': 'OH',
+    'Oklahoma': 'OK',
+    'Oregon': 'OR',
+    'Pennsylvania': 'PA',
+    'Puerto Rico': 'PR',
+    'Rhode Island': 'RI',
+    'South Carolina': 'SC',
+    'South Dakota': 'SD',
+    'Tennessee': 'TN',
+    'Texas': 'TX',
+    'Utah': 'UT',
+    'Vermont': 'VT',
+    'Virginia': 'VA',
+    'Washington': 'WA',
+    'West Virginia': 'WV',
+    'Wisconsin': 'WI',
+    'Wyoming': 'WY',
+    'United States Virgin Islands': 'VI'
+}
+
 
 def get_general_path():
     '''Function to get the general path'''
@@ -16,19 +73,16 @@ def get_general_path():
     general_path = os.path.join(file_path, '..')
     return general_path
 
-
 def join_paths(*p1):
     """
     Helper function to join paths
     """
     return os.path.join(*p1)
 
-
 def check_if_filepath_exists(filepath):
     """Check if the corresponding path exists."""
     exists = os.path.exists(filepath)
     return exists
-
 
 def make_desired_folder(data_file_path):
     general_path = get_general_path()
@@ -38,13 +92,11 @@ def make_desired_folder(data_file_path):
         os.makedirs(file_path)
     return None
 
-
 def get_data_path(name):
     '''Obtain the relative path for the data folder'''
     general_path = get_general_path()
     file_path = join_paths(general_path, 'data', name)
     return file_path
-
 
 def save_dataframe(filepath, dataframe, file_format='parquet'):
     """ Saves dataframe into the desired path as the desired format.
@@ -61,7 +113,6 @@ def save_dataframe(filepath, dataframe, file_format='parquet'):
     elif file_format == 'pickle':
         dataframe.to_pickle(filepath)
     print(f'Data was saved into `{filepath}`.')
-
 
 def get_config_file():
     """Access the configuration file with the URL links"""
@@ -82,7 +133,6 @@ def key_list(dictionary):
     """Get the keys of a dictionary as a list"""
     key_list_dict = list(dictionary.keys())
     return key_list_dict
-
 
 def save_shapefile_from_url_zip(url, save_data_path):
     """From a URL, that downloads a zip file containing shp files, download the info and
@@ -108,7 +158,6 @@ def save_shapefile_from_url_zip(url, save_data_path):
     main_file = os.path.join(save_data_path, file_name)
     return main_file
 
-
 def save_info(main_file, filepath):
     "Read a main file shp dataframe and save it into a desired path"
     if not check_if_filepath_exists(filepath):
@@ -121,3 +170,44 @@ def save_as_json(what, where):
     if not check_if_filepath_exists(where):
         with open(where, 'w') as f:
             json.dump(what, f)
+
+def miniprocess_outage_raw_df(outages):
+    print('Processing outages...')
+    print('Deleting customers_out nulls...')
+    outages = outages[outages.customers_out.notna()]  # Filter nan values from customers_out
+    # Then we keep only the relevant outage (affecting a high amount of customers)
+    print(f'Keeping relevant outages according to CUSTOMERS_OUT_NB={CUSTOMERS_OUT_NB}')
+    outages = outages[outages.customers_out >= CUSTOMERS_OUT_NB]
+    print('Changing run_start_time to datetime...')
+    outages.run_start_time = pd.to_datetime(outages.run_start_time)  # Transform into datetime to manipulate dates
+    print('Mapping state_ids...')
+    outages["state_id"] = outages.state.map(STATE_ABBREVIATIONS) # Use the state abbreviations to get an ID
+    print('Filling fips_code_ids...')
+    outages["fips_code_id"] = outages.fips_code.astype(str).str.zfill(5)
+    outages["sub_general_id"] = (outages.fips_code_id + '_' + outages.state_id)
+    #print(f"Outage Information:\n")
+    #outages.info()
+    #print('')
+    return outages
+
+def get_required_outages_dfs(*years, eaglei_data_path=None):
+    eaglei_data_paths = os.listdir(eaglei_data_path)
+    paths = []
+    for year in years:
+        paths += [join_paths(eaglei_data_path,file) for file in eaglei_data_paths if str(year) in file]
+    dfs = []
+    for file in paths:
+        print(f"Reading file: {file}.")
+        outage_data = pd.read_csv(file)
+        outage = miniprocess_outage_raw_df(outage_data)
+        dfs.append(outage)
+    print("Done reading.")
+    if len(paths) > 1:
+        print("Merging information.")
+        outages_df = pd.concat(dfs)
+        del dfs
+    else:
+        outages_df = dfs[0]
+    print('Data is ready.')
+
+    return outages_df
