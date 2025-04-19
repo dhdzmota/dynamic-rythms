@@ -107,10 +107,12 @@ def fix_fips_codes():
     corrected_percentage = corrected_fips/storm_events_unofficial_fips * 100
     print(f'It was possible a correction of about {corrected_percentage}% of cases.')
 
-
-if __name__ == "__main__":
+def execute():
     if not utils.check_if_filepath_exists(STORM_EVENTS_CLEANED_PATH):
         fix_fips_codes()
     else:
         print(f'File already exists, it is located at: {STORM_EVENTS_CLEANED_PATH}')
 
+
+if __name__ == "__main__":
+    execute()

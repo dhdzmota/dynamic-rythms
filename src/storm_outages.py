@@ -241,9 +241,12 @@ def create_storm_caused_outage():
     print(f'Saving results into the following path: {STORM_OUTAGES}')
     storms_with_response_var.to_parquet(STORM_OUTAGES)
 
-
-if __name__ == "__main__":
+def execute():
     if not utils.check_if_filepath_exists(STORM_OUTAGES):
         create_storm_caused_outage()
     else:
         print(f'File already exists, it is located at: {STORM_OUTAGES}')
+
+
+if __name__ == "__main__":
+    execute()
