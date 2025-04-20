@@ -2,11 +2,12 @@ import geopandas as gpd
 import json
 import os
 import pandas as pd
-import yaml
 import pickle
+import urllib
+import yaml
 
 from io import BytesIO
-from urllib.request import urlopen
+#from urllib.request import urlopen
 from zipfile import ZipFile
 
 CUSTOMERS_OUT_NB = 10**3.5 # 10**3.5
@@ -140,7 +141,8 @@ def save_shapefile_from_url_zip(url, save_data_path):
     """
     if not check_if_filepath_exists(save_data_path):
         print('Downloading info...')
-        url_response = urlopen(url)
+        req = urllib.request.Request(url, headers={'User-Agent': "Magic Browser"})
+        url_response = urllib.request.urlopen(req)
         zip_file = ZipFile(BytesIO(url_response.read()))
 
         for f in zip_file.namelist():
