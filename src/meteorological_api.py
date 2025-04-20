@@ -18,6 +18,8 @@ METEOROLOGICAL_API_KEY = 'METEOROLOGICAL_API_URL'
 config = utils.get_config_file()  # Bottleneck
 parameters = utils.get_parameters_file()  # Bottleneck
 RANDOM_SEED = config['RANDOM_SEED']
+ELEMENT_NB = 200
+SLEEP = 5
 
 GENERAL_PATH = utils.get_general_path()
 RAW_DATA_PATH = utils.get_data_path('raw')
@@ -118,7 +120,7 @@ def download_process():
 
     meteorological_storms_fips = get_meteorological_storm_fips()
     unique_storm_fips = set(outages_storms.episode_fips_id + '.json')
-    element_nb = 200
+
     remaining_to_download = unique_storm_fips - meteorological_storms_fips
     actual_len = len(remaining_to_download)
     len_list = 0
@@ -126,7 +128,7 @@ def download_process():
         outages_storms_candidates = outages_storms[
             (outages_storms.episode_fips_id + '.json').isin(list(remaining_to_download))
         ]
-        sample_outages_storms = outages_storms_candidates.sample(element_nb)
+        sample_outages_storms = outages_storms_candidates.sample(ELEMENT_NB)
         sample_outages_storms = sample_outages_storms.rename(columns=meaning_dict)
         sample_outages_storms['one_day_before_storm'] = (
                     sample_outages_storms['storm_start'] - pd.Timedelta(1, unit='D')
@@ -155,7 +157,7 @@ def download_process():
             save_meteorological_info_from_row_point(row)
         print('Done with saving.')
         print(f'Time it took {t1-t0}.')
-        time.sleep(5)
+        time.sleep(SLEEP)
         meteorological_storms_fips = get_meteorological_storm_fips()
         unique_storm_fips = set(outages_storms.episode_fips_id + '.json')
         current_len = actual_len
