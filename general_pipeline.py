@@ -4,6 +4,7 @@ command_list = [
     'python src/downloader.py',
     'python src/cleaner.py',
     'python src/storm_outages.py',
+    'python src/meteorological_api.py',
     #'python src/create_features.py',
     #'python src/model.py'
 ]

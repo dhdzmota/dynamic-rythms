@@ -10,10 +10,8 @@ WGS84 = "EPSG:4326"  # World Geodetic System 1984 ensemble
 
 EXTERNAL_DATA_PATH = utils.get_data_path('external')
 GENERAL_PATH = utils.get_general_path()
-
 RAW_CITY_DATA_PATH = utils.join_paths(EXTERNAL_DATA_PATH, 'cities_raw')
 RAW_COUNTY_DATA_PATH = utils.join_paths(EXTERNAL_DATA_PATH, 'counties_raw')
-
 CITY_DATA_PATH = utils.join_paths(EXTERNAL_DATA_PATH, 'city.parquet')
 COUNTY_DATA_PATH = utils.join_paths(EXTERNAL_DATA_PATH, 'county.parquet')
 
