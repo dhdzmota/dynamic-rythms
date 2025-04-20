@@ -24,8 +24,8 @@ RAW_DATA_PATH = utils.get_data_path('raw')
 INTERIM_DATA_PATH = utils.get_data_path('interim')
 DYNAMIC_RYTHMS_DATA_PATH = utils.join_paths(RAW_DATA_PATH, 'dynamic-rhythms-train-data', 'data')
 EAGLEI_DATA_PATH = utils.join_paths(DYNAMIC_RYTHMS_DATA_PATH, 'eaglei_data')
-STORM_EVENTS_CLEANED_PATH = utils.join_paths(INTERIM_DATA_PATH, 'storm_events_cleaned2.csv')
-STORM_OUTAGES = utils.join_paths(INTERIM_DATA_PATH, 'storm_outages_2014_2023b.parquet')
+STORM_EVENTS_CLEANED_PATH = utils.join_paths(INTERIM_DATA_PATH, 'storm_events_cleaned.csv')
+STORM_OUTAGES = utils.join_paths(INTERIM_DATA_PATH, 'storm_outages_2014_2023.parquet')
 
 
 warnings.filterwarnings('ignore')

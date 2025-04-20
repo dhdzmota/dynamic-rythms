@@ -26,7 +26,7 @@ RAW_DATA_PATH = utils.get_data_path('raw')
 INTERIM_DATA_PATH = utils.get_data_path('interim')
 EXTERNAL_DATA_PATH = utils.get_data_path('external')
 METEOROLOGICAL_DATA_PATH = utils.join_paths(RAW_DATA_PATH, 'meteorological')
-STORM_OUTAGES = utils.join_paths(INTERIM_DATA_PATH, 'storm_outages_2014_2023b.parquet')
+STORM_OUTAGES = utils.join_paths(INTERIM_DATA_PATH, 'storm_outages_2014_2023.parquet')
 COUNTY_DATA_PATH = utils.join_paths(EXTERNAL_DATA_PATH, 'county.parquet')
 
 warnings.filterwarnings('ignore')

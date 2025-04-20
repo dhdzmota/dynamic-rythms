@@ -20,7 +20,7 @@ DYNAMIC_RYTHMS_DATA_PATH = utils.join_paths(RAW_DATA_PATH, 'dynamic-rhythms-trai
 EAGLEI_DATA_PATH = utils.join_paths(DYNAMIC_RYTHMS_DATA_PATH, 'eaglei_data')
 NOAA_DATA_PATH = utils.join_paths(DYNAMIC_RYTHMS_DATA_PATH, 'NOAA_StormEvents')
 STORM_EVENTS_PATH = utils.join_paths(NOAA_DATA_PATH, 'StormEvents_2014_2024.csv')
-STORM_EVENTS_CLEANED_PATH = utils.join_paths(INTERIM_DATA_PATH, 'storm_events_cleaned2.csv')
+STORM_EVENTS_CLEANED_PATH = utils.join_paths(INTERIM_DATA_PATH, 'storm_events_cleaned.csv')
 
 
 WORD_SIMILARITY_THRESHOLD = 0.8
