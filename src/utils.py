@@ -122,6 +122,14 @@ def get_config_file():
         config = yaml.safe_load(f)
     return config
 
+def get_model_hyperparameters():
+    """Access de hyperparameters file."""
+    general_path = get_general_path()
+    json_path = join_paths(general_path, 'config', 'model_params.json')
+    with open(json_path, 'r') as f:
+        hyperparams = json.loads(f)
+    return hyperparams
+
 def get_parameters_file():
     """Access the parameters file with the params definitions"""
     general_path = get_general_path()
@@ -227,3 +235,19 @@ def get_required_outages_dfs(*years, eaglei_data_path=None):
     print('Data is ready.')
 
     return outages_df
+
+def save_pickle_model(model:any, file_name:str='outage_model.pkl')->None:
+    """
+    save a given model into a pickle file in the model folder
+
+    Args:
+        model (any): model to be saved.
+        file_name (str, optional): name to save the model. 
+                    Defaults to 'outage_model.pkl'.
+    """
+    general_path = get_general_path()
+    model_folder = join_paths(general_path, 'models')
+    os.makedirs(model_folder, exist_ok=True)
+    model_path = join_paths(model_folder, file_name)
+    with open(model_path, 'wb') as f:
+        pickle.dump(model, f)
