@@ -1,12 +1,13 @@
 import subprocess
 
 command_list = [
+    # Download process and clean data
     'python src/downloader.py',
     'python src/cleaner.py',
     'python src/storm_outages.py',
     'python src/meteorological_api.py',
-    #'python src/create_features.py',
-    #'python src/model.py'
+    # Generate datasets for model
+    'python src/data_dataset_creation.py'
 ]
 
 for command in command_list:
