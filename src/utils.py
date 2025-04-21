@@ -7,7 +7,6 @@ import urllib
 import yaml
 
 from io import BytesIO
-#from urllib.request import urlopen
 from zipfile import ZipFile
 
 CUSTOMERS_OUT_NB = 10**3.5 # 10**3.5
@@ -134,6 +133,21 @@ def key_list(dictionary):
     """Get the keys of a dictionary as a list"""
     key_list_dict = list(dictionary.keys())
     return key_list_dict
+
+def save_json_from_url_zip(url, save_data_path, verbose=False):
+    """From a URL, that downloads a zip file containing json files, download the info.
+    """
+    print('Downloading info...')
+    req = urllib.request.Request(url, headers={'User-Agent': "Magic Browser"})
+    url_response = urllib.request.urlopen(req)
+    zip_file = ZipFile(BytesIO(url_response.read()))
+    for f in zip_file.namelist():
+        if f.endswith('.json'):
+            zip_file.extract(f, path=save_data_path)
+            if verbose:
+                print(f'Extracting {f} into {save_data_path}')
+    print(f'Done with extraction into {save_data_path}.')
+    return None
 
 def save_shapefile_from_url_zip(url, save_data_path):
     """From a URL, that downloads a zip file containing shp files, download the info and

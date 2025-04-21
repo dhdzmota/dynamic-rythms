@@ -11,7 +11,7 @@ import warnings
 
 import src.utils as utils
 
-
+METEOROLOGICAL_DOWNLOADABLE_URL_KEY = 'METEOROLOGICAL_DOWNLOADABLE'
 meaning_dict = {'begin_datetime': 'storm_start', 'end_datetime': 'storm_end', 'run_start_time_min': 'outage_start', 'run_start_time_max': 'outage_end'}
 API_CALLS_ON = False
 METEOROLOGICAL_API_KEY = 'METEOROLOGICAL_API_URL'
@@ -105,15 +105,7 @@ def get_meteorological_storm_fips():
     unique_meteorological_storm_fips = set(meteorological_files)
     return unique_meteorological_storm_fips
 
-def download_process():
-    if not API_CALLS_ON:
-        print(
-            f'API calls are turned off. '
-            f'If you know what you are doing, change the API_CALLS_ON parameter on the script. '
-            f'Otherwise, information might already be existing at {METEOROLOGICAL_DATA_PATH}'
-        )
-        return None
-    # Read data
+def request_json_meteorological_files():
     counties = gpd.read_parquet(COUNTY_DATA_PATH)
     counties['fips_code_id'] = counties['STATEFP'] + counties['COUNTYFP']
     outages_storms = get_outage_storms()
@@ -170,6 +162,37 @@ def download_process():
         else:
             len_list = 0
 
+def getting_downloadable_meteorological_folder():
+    url = config[METEOROLOGICAL_DOWNLOADABLE_URL_KEY]
+    print(f'Getting info from {url}...')
+    utils.save_json_from_url_zip(
+        url=url, save_data_path=EXTERNAL_DATA_PATH
+    )
+    return None
+
+
+def api_call_is_off():
+    print(
+        f'API calls are turned off. '
+        f'If you know what you are doing, change the API_CALLS_ON parameter on the script. '
+        f'Otherwise, information might already be existing at {METEOROLOGICAL_DATA_PATH}'
+    )
+    print('Checking if meteorological information is downloaded...')
+    meteorological_filepath_exists = utils.check_if_filepath_exists(METEOROLOGICAL_DATA_PATH)
+    if not meteorological_filepath_exists:
+        print('Attempting to download from uploaded file...')
+        getting_downloadable_meteorological_folder()
+    else:
+        print(f'Meteorological data exists at {METEOROLOGICAL_DATA_PATH}')
+    return meteorological_filepath_exists
+
+
+def download_process():
+    if not API_CALLS_ON:
+        api_call_is_off()
+        return None
+    else:
+        request_json_meteorological_files()
 
 if __name__ == '__main__':
     download_process()
