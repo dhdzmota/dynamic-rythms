@@ -1,4 +1,6 @@
 '''
+This script is used to create a dataset based on storms outages and in the meteorological information.
+The script should yield the meteorological_data_with_outages.parquet file.
 '''
 import src.utils as utils
 
@@ -20,7 +22,12 @@ METEOROLOGICAL_OUTAGES = utils.join_paths(INTERIM_DATA_PATH, 'meteorological_dat
 
 warnings.filterwarnings('ignore')
 
+
 def process_storm_outages():
+    """ Function that process storm_outages (reads file, groups values, and aggregates info).
+
+    :return:
+    """
     print('Processing storm-outage data...')
     storm_outages = pd.read_parquet(STORM_OUTAGES)
     storm_outages_grouped = storm_outages.groupby('episode_fips_id').agg(
@@ -40,6 +47,12 @@ def process_storm_outages():
 
 
 def get_data_with_response_variable(met_file, storm_outages_g):
+    """ Reads meteorological file from meteorological folder, process it and joins it with storm outages.
+
+    :param met_file: str Text that contains the episode_fips_id.json files.
+    :param storm_outages_g:
+    :return:
+    """
     episode_fips_id = met_file.split('.')[0]
     path = utils.join_paths(METEOROLOGICAL_DATA_PATH, met_file)
     with open(path, 'r') as f:
@@ -115,7 +128,13 @@ def get_data_with_response_variable(met_file, storm_outages_g):
         print(f'There was an error with {episode_fips_id} at path: {path}')
         return None
 
+
 def create_outage_meteorological_dataset(save=True):
+    """Creates outage meteorological dataset, with the save (if desired).
+
+    :param save: bool
+    :return:
+    """
     storm_outages_grouped = process_storm_outages()
     meteorological_files = os.listdir(METEOROLOGICAL_DATA_PATH)
     data_with_response_variable = []
@@ -139,7 +158,12 @@ def create_outage_meteorological_dataset(save=True):
 
     return outage_meteorological_dataset
 
+
 def execute():
+    """ Main function that generates the storm outage with meteorological information.
+
+    :return:
+    """
     print('Generating Storm-outage data with meteorological information.')
     if not utils.check_if_filepath_exists(METEOROLOGICAL_OUTAGES):
         create_outage_meteorological_dataset()
