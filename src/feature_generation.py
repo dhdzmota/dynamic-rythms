@@ -1,6 +1,15 @@
+import pandas as pd
+
 from pandas import DataFrame
 
+import src.data_dataset_creation as data_dataset_creation
+import src.utils as utils
+
+
 RANGE = [1, 2, 3]
+
+INTERIM_DATA_PATH = utils.get_data_path('interim')
+OUTAGE_FEATURES_FILE = utils.join_paths(INTERIM_DATA_PATH, 'outage_features.parquet')
 
 
 class OutageFeatures:
@@ -8,7 +17,7 @@ class OutageFeatures:
      Creates all features for outage Model.
     """
     def __init__(self, data: DataFrame) -> None:
-        self.df = data
+        self.df = data.copy()
         self.no_work_cols = [
             'time',
             'episode_fips_id',
@@ -75,6 +84,12 @@ class OutageFeatures:
         self.df[f'{col}_two_previous_tendency'] = self.df[f'{col}_delta_two_previous'].apply(tendency_func)
         self.df[f'{col}_current_tendency'] = self.df[f'{col}_delta_one_hour'].apply(tendency_func)
 
+    def drop_null_rows_from_lag(self) -> None:
+        """ Drops the Null rows that are naturally generated due to the lag.
+        :return:
+        """
+        self.df.dropna(subset=[f'T2M_{max(RANGE)}_hours_ago'], inplace=True)
+
     def get_features(self) -> DataFrame:
         """Create all features for the outage model.
 
@@ -90,5 +105,35 @@ class OutageFeatures:
                 self.get_feature_previous_n_hours(col, ix)
             self.get_delta_featues(col)
             self.get_tendency_features(col)
-
+        self.drop_null_rows_from_lag()
         return self.df
+
+
+def compute_features(save=True, return_df=False):
+    data = data_dataset_creation.get_data()
+    print('Computing the features...')
+    outage_features = OutageFeatures(data=data)
+    data_features = outage_features.get_features()
+    print('Done.')
+    if save:
+        print(f'Saving feature data at: {OUTAGE_FEATURES_FILE}')
+        data_features.to_parquet(OUTAGE_FEATURES_FILE)
+    if return_df:
+        return data_features
+
+
+def get_data():
+    """ Function to get the METEOROLOGICAL_OUTAGES data
+
+    :return: pd.DataFrame
+    """
+    if utils.check_if_filepath_exists(OUTAGE_FEATURES_FILE):
+        print(f'Reading {OUTAGE_FEATURES_FILE} file')
+        data = pd.read_parquet(OUTAGE_FEATURES_FILE)
+        return data
+    print('File does not exist, please compute it.')
+    return None
+
+
+if __name__ == "__main__":
+    compute_features(save=True, return_df=False)
