@@ -12,7 +12,12 @@ import warnings
 import src.utils as utils
 
 METEOROLOGICAL_DOWNLOADABLE_URL_KEY = 'METEOROLOGICAL_DOWNLOADABLE'
-meaning_dict = {'begin_datetime': 'storm_start', 'end_datetime': 'storm_end', 'run_start_time_min': 'outage_start', 'run_start_time_max': 'outage_end'}
+meaning_dict = {
+    'begin_datetime': 'storm_start',
+    'end_datetime': 'storm_end',
+    'run_start_time_min': 'outage_start',
+    'run_start_time_max': 'outage_end'
+}
 API_CALLS_ON = False
 METEOROLOGICAL_API_KEY = 'METEOROLOGICAL_API_URL'
 config = utils.get_config_file()  # Bottleneck
@@ -59,14 +64,17 @@ def get_api_url(lat, lon, datetime_start, datetime_end, temporality='hourly'):
            f'{start_date}{end_date}{final_format}')
     return url
 
+
 def get_meteorological_info(url):
     text_information = requests.get(url).text
     formated_text_information = json.loads(text_information)
     time.sleep(1)
     return formated_text_information
 
+
 def save_meteorological_information(information, path):
     utils.save_as_json(what=information, where=path)
+
 
 def get_url_params_from_row_point(storm_outage_row, desired_point=None):
     lon = storm_outage_row[desired_point].x
@@ -81,6 +89,7 @@ def get_url_params_from_row_point(storm_outage_row, desired_point=None):
         return url
     return np.nan
 
+
 def save_meteorological_info_from_row_point(storm_outage_row_iterated):
     idx, storm_outage_row = storm_outage_row_iterated
     identifier = storm_outage_row['episode_fips_id']
@@ -94,16 +103,19 @@ def save_meteorological_info_from_row_point(storm_outage_row_iterated):
         return 1
     return np.nan
 
+
 def get_outage_storms():
     storm_outages_info = pd.read_parquet(STORM_OUTAGES)
     # We keep only storms that caused an outage.
     outages_storms = storm_outages_info[storm_outages_info.storm_caused_outage == 1]
     return outages_storms
 
+
 def get_meteorological_storm_fips():
     meteorological_files = os.listdir(METEOROLOGICAL_DATA_PATH)
     unique_meteorological_storm_fips = set(meteorological_files)
     return unique_meteorological_storm_fips
+
 
 def request_json_meteorological_files():
     counties = gpd.read_parquet(COUNTY_DATA_PATH)
@@ -162,6 +174,7 @@ def request_json_meteorological_files():
         else:
             len_list = 0
 
+
 def getting_downloadable_meteorological_folder():
     url = config[METEOROLOGICAL_DOWNLOADABLE_URL_KEY]
     print(f'Getting info from {url}...')
@@ -193,6 +206,7 @@ def download_process():
         return None
     else:
         request_json_meteorological_files()
+
 
 if __name__ == '__main__':
     download_process()

@@ -209,9 +209,6 @@ def miniprocess_outage_raw_df(outages):
     print('Filling fips_code_ids...')
     outages["fips_code_id"] = outages.fips_code.astype(str).str.zfill(5)
     outages["sub_general_id"] = (outages.fips_code_id + '_' + outages.state_id)
-    #print(f"Outage Information:\n")
-    #outages.info()
-    #print('')
     return outages
 
 def get_required_outages_dfs(*years, eaglei_data_path=None):

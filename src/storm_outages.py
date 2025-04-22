@@ -3,10 +3,7 @@ This main script aims to generate the overlap between storms and outages.
 '''
 
 import src.utils as utils
-import os
-import geopandas as gpd
 import pandas as pd
-import numpy
 import warnings
 
 # Min number of customers affected.
@@ -27,8 +24,8 @@ EAGLEI_DATA_PATH = utils.join_paths(DYNAMIC_RYTHMS_DATA_PATH, 'eaglei_data')
 STORM_EVENTS_CLEANED_PATH = utils.join_paths(INTERIM_DATA_PATH, 'storm_events_cleaned.csv')
 STORM_OUTAGES = utils.join_paths(INTERIM_DATA_PATH, 'storm_outages_2014_2023.parquet')
 
-
 warnings.filterwarnings('ignore')
+
 
 def get_outages_index(outages_county):
     ''' This function groups outages depending on their separation
@@ -41,8 +38,6 @@ def get_outages_index(outages_county):
     outages_county = outages_county[outages_county.customers_out >= CUSTOMERS_OUT_NB]
     # We can define a separation of continuity to "divide" timelapses, in other words, separate outages events.
     # We calculate the difference in seconds of each outage
-    MIN_OUTAGE_SECONDS = 60 * 15 # Represents 15 minutes, in seconds
-    NB_15_MIN_IN_HOUR = 4
     outages_county['second_difference'] = outages_county.run_start_time.diff().dt.total_seconds()
     # Each time we find an interval mark greater than the separation time (defined in separation_hours),
     # we identify it as true (1), or false (0).
@@ -53,6 +48,7 @@ def get_outages_index(outages_county):
     # then we do the cumulative sum to "generate an index" of same representation.
     outages_county['outage_index'] = outages_county['interval_mark'].cumsum()
     return outages_county
+
 
 def process_outages(outages):
     """ Function that process outages information, creating an outage_index_resumed dataframe.
@@ -93,6 +89,7 @@ def process_outages(outages):
     )
     outages_index_resumed['state'] = outages_index_resumed['state'].str.lower()
     return outages_index_resumed
+
 
 def process_storm_events(storm_events):
     ''' Function that processess the storm events by grouping them and finally yielding storm episodes by county.
@@ -159,6 +156,7 @@ def process_storm_events(storm_events):
     storms_state_exploded = storms_state_exploded[storm_state_exploded_columns]
     return storms_state_exploded
 
+
 def combining_outages_and_storms(storms_state_exploded, outages_index_resumed):
     storms_outages = storms_state_exploded.merge(
         outages_index_resumed,
@@ -218,6 +216,7 @@ def combining_outages_and_storms(storms_state_exploded, outages_index_resumed):
     storms_with_response_var.storm_caused_outage = storms_with_response_var.storm_caused_outage.fillna(0)
     return storms_with_response_var
 
+
 def create_storm_caused_outage():
     # Read data
     storm_events = pd.read_csv(STORM_EVENTS_CLEANED_PATH)
@@ -231,7 +230,6 @@ def create_storm_caused_outage():
     # Process storms info
     print('Processing Storm events...')
     storms_state_exploded = process_storm_events(storm_events=storm_events)
-
     # Merge outages and storms, generate a dataframe if storm caused outage.
     print('Processing Merging Storm events and outages...')
     storms_with_response_var = combining_outages_and_storms(
@@ -240,6 +238,7 @@ def create_storm_caused_outage():
     )
     print(f'Saving results into the following path: {STORM_OUTAGES}')
     storms_with_response_var.to_parquet(STORM_OUTAGES)
+
 
 def execute():
     if not utils.check_if_filepath_exists(STORM_OUTAGES):

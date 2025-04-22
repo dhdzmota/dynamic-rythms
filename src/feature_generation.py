@@ -40,8 +40,8 @@ class OutageFeatures:
     def get_delta_featues(self, col:str)-> None:
         """For a given column it calculate:
             - Diference between the current value vs the value 
-            n hours before (in this case 1, 2 and 3 hous)
-            - Diference between value hours (i.e. the value 1 hour befor vs the value 3 hous before)
+            n hours before (in this case 1, 2 and 3 hours)
+            - Diference between value hours (i.e. the value 1 hour before vs the value 3 hours before)
 
         Args:
             col (str): column to calculate the deltas.
