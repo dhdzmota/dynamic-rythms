@@ -14,7 +14,14 @@ class OutageFeatures:
             'episode_fips_id',
             'meteorological_current_datetime_val',
             'outage_in_an_hour',
-            'hours_to_outage'
+            'hours_to_outage',
+            'day_of_year',
+            'hour_of_day',
+            'day_of_week',
+            'month_of_year',
+            'coord0',
+            'coord1',
+            'coord2',
         ]
         self.work_cols = [
             col for col in self.df.columns if col not in self.no_work_cols
@@ -47,11 +54,11 @@ class OutageFeatures:
         :param col: str Column to calculate the deltas
         :return:
         """
-        self.df[f'{col}_delta_one_hour'] = self.df[col] - self.df[f'{col}_an_hour_ago']
-        self.df[f'{col}_delta_two_hour'] = self.df[col] - self.df[f'{col}_two_hours_ago']
-        self.df[f'{col}_delta_three_hour'] = self.df[col] - self.df[f'{col}_three_hours_ago']
-        self.df[f'{col}_delta_previous'] = self.df[f'{col}_an_hour_ago'] - self.df[f'{col}_two_hours_ago']
-        self.df[f'{col}_delta_two_previous'] = self.df[f'{col}_two_hours_ago'] - self.df[f'{col}_three_hours_ago']
+        self.df[f'{col}_delta_one_hour'] = self.df[col] - self.df[f'{col}_1_hours_ago']
+        self.df[f'{col}_delta_two_hour'] = self.df[col] - self.df[f'{col}_2_hours_ago']
+        self.df[f'{col}_delta_three_hour'] = self.df[col] - self.df[f'{col}_3_hours_ago']
+        self.df[f'{col}_delta_previous'] = self.df[f'{col}_1_hours_ago'] - self.df[f'{col}_2_hours_ago']
+        self.df[f'{col}_delta_two_previous'] = self.df[f'{col}_2_hours_ago'] - self.df[f'{col}_3_hours_ago']
 
     def get_tendency_features(self, col: str) -> None:
         """Calculate the tendency of the values with the follow logic:
