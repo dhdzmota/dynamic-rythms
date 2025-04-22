@@ -171,5 +171,15 @@ def execute():
         print(f'File already exists, it is located at: {METEOROLOGICAL_OUTAGES}')
 
 
+def get_data():
+    """ Function to get the METEOROLOGICAL_OUTAGES data
+
+    :return: pd.DataFrame
+    """
+    data = pd.read_parquet(METEOROLOGICAL_OUTAGES)
+    return data
+
+
+
 if __name__ == "__main__":
     execute()
