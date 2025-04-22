@@ -29,8 +29,8 @@ class OutageFeatures:
 
     def get_diff_features(self) -> None:
         """Generates features about:
-        - Diference between temperature at 10 meters and at 2 meters.
-        - Diference between Wind speed at 50 meters and at 2 meters.
+        - Difference between temperature at 10 meters and at 2 meters.
+        - Difference between Wind speed at 50 meters and at 2 meters.
 
         :return:
         """
