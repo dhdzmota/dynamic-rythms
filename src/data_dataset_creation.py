@@ -176,9 +176,12 @@ def get_data():
 
     :return: pd.DataFrame
     """
-    data = pd.read_parquet(METEOROLOGICAL_OUTAGES)
-    return data
-
+    if utils.check_if_filepath_exists(METEOROLOGICAL_OUTAGES):
+        print(f'Reading {METEOROLOGICAL_OUTAGES} file')
+        data = pd.read_parquet(METEOROLOGICAL_OUTAGES)
+        return data
+    print('File does not exist, please compute it.')
+    return None
 
 
 if __name__ == "__main__":
