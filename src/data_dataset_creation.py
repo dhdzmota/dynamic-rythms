@@ -10,7 +10,7 @@ import pandas as pd
 import warnings
 
 
-HOURS_BEFORE_START = 3
+HOURS_BEFORE_START = 10
 
 
 GENERAL_PATH = utils.get_general_path()
@@ -159,13 +159,13 @@ def create_outage_meteorological_dataset(save=True):
     return outage_meteorological_dataset
 
 
-def execute():
+def execute(force=False):
     """ Main function that generates the storm outage with meteorological information.
 
     :return:
     """
     print('Generating Storm-outage data with meteorological information.')
-    if not utils.check_if_filepath_exists(METEOROLOGICAL_OUTAGES):
+    if not utils.check_if_filepath_exists(METEOROLOGICAL_OUTAGES) or force:
         create_outage_meteorological_dataset()
     else:
         print(f'File already exists, it is located at: {METEOROLOGICAL_OUTAGES}')
