@@ -92,20 +92,19 @@ def model_score(model, X):
 
 
 def train_model(force=False, save_data=False):
-    # Read data
-    datasets = read_splitted_data()
-    x, y, info = get_datasets_x_y_info(datasets)
-
-    neg = (y['train'] == 0).sum()
-    pos = (y['train'] == 1).sum()
-    scale_pos_weight = neg / pos
-
-    XGB_PARAMETERS['scale_pos_weight'] = scale_pos_weight
-    print(f' The model parameters are: {XGB_PARAMETERS}')
-
-    model = XGBClassifier(**XGB_PARAMETERS)
-
     if not utils.check_if_filepath_exists(MODEL_FILENAME) or force:
+        # Read data
+        datasets = read_splitted_data()
+        x, y, info = get_datasets_x_y_info(datasets)
+
+        neg = (y['train'] == 0).sum()
+        pos = (y['train'] == 1).sum()
+        scale_pos_weight = neg / pos
+
+        XGB_PARAMETERS['scale_pos_weight'] = scale_pos_weight
+        print(f' The model parameters are: {XGB_PARAMETERS}')
+
+        model = XGBClassifier(**XGB_PARAMETERS)
         print('Start with training...')
         model.fit(
             x['train'],
@@ -114,19 +113,19 @@ def train_model(force=False, save_data=False):
         )
         save_model(model)
 
+        for key in info.keys():
+            info[key]['y'] = y[key]
+            info[key]['pred'] = model_score(model, x[key])
+        if save_data:
+            print('Saving data...')
+            save_x_y_info(x, info)
     else:
         print(
             f'Model has already been trained and already exists'
-            f', it is located at: {MODEL_PATH}'
+            f', it is located at: {MODEL_FILENAME}'
         )
         model = get_model()
-
-    for key in info.keys():
-        info[key]['y'] = y[key]
-        info[key]['pred'] = model_score(model, x[key])
-    if save_data:
-        print('Saving data...')
-        save_x_y_info(x, info)
+    return model
 
 
 if __name__ == "__main__":
