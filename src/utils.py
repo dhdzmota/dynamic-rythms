@@ -67,6 +67,14 @@ STATE_ABBREVIATIONS = {
     'United States Virgin Islands': 'VI'
 }
 
+SET_COLOR_DICT = {
+    'train': '#f8cc62',
+    'test': '#bba681',
+    'eval': '#737373',
+    'cal': '#41596a',
+    'OOT': '#7f95a4',
+}
+
 
 def get_general_path():
     '''Function to get the general path'''
@@ -195,6 +203,17 @@ def save_as_json(what, where):
     if not check_if_filepath_exists(where):
         with open(where, 'w') as f:
             json.dump(what, f)
+
+def save_as_pickle(what, where):
+    if not check_if_filepath_exists(where):
+        with open(where, 'wb') as f:
+            pickle.dump(what, f)
+
+
+def read_pickle(where):
+    with open(where, 'rb') as f:
+        loaded_file = pickle.load(f)
+        return loaded_file
 
 def miniprocess_outage_raw_df(outages):
     print('Processing outages...')
