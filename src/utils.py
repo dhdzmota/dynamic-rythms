@@ -9,6 +9,7 @@ import yaml
 from io import BytesIO
 from zipfile import ZipFile
 
+RANDOM_SEED = 42
 CUSTOMERS_OUT_NB = 10**3.5 # 10**3.5
 STATE_ABBREVIATIONS = {
     'Alabama': 'AL',
