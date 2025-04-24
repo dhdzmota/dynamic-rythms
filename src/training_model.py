@@ -91,7 +91,7 @@ def model_score(model, X):
     return score
 
 
-def train_model(force=False):
+def train_model(force=False, save_data=False):
     # Read data
     datasets = read_splitted_data()
     x, y, info = get_datasets_x_y_info(datasets)
@@ -124,8 +124,9 @@ def train_model(force=False):
     for key in info.keys():
         info[key]['y'] = y[key]
         info[key]['pred'] = model_score(model, x[key])
-
-    save_x_y_info(x, info)
+    if save_data:
+        print('Saving data...')
+        save_x_y_info(x, info)
 
 
 if __name__ == "__main__":
