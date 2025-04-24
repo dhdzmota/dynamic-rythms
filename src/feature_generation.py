@@ -69,11 +69,6 @@ class OutageFeatures:
             self.df[f'{col}_delta_{ix}_previous'] = (
                     self.df[f'{col}_{ix}_hours_ago'] - self.df[f'{col}_{ix+1}_hours_ago']
             )
-        #self.df[f'{col}_delta_one_hour'] = self.df[col] - self.df[f'{col}_1_hours_ago']
-        #self.df[f'{col}_delta_two_hour'] = self.df[col] - self.df[f'{col}_2_hours_ago']
-        #self.df[f'{col}_delta_three_hour'] = self.df[col] - self.df[f'{col}_3_hours_ago']
-        #self.df[f'{col}_delta_previous'] = self.df[f'{col}_1_hours_ago'] - self.df[f'{col}_2_hours_ago']
-        #self.df[f'{col}_delta_two_previous'] = self.df[f'{col}_2_hours_ago'] - self.df[f'{col}_3_hours_ago']
 
     def get_tendency_features(self, col: str) -> None:
         """Calculate the tendency of the values with the follow logic:
@@ -110,7 +105,6 @@ class OutageFeatures:
             for ix in RANGE:
                 self.get_feature_previous_n_hours(col, ix)
             self.get_delta_featues(col)
-            # self.get_tendency_features(col) No relevant features according to shap (redundancy with trees algorithms).
         self.drop_null_rows_from_lag()
         return self.df
 
