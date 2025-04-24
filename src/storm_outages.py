@@ -10,7 +10,7 @@ import warnings
 CUSTOMERS_OUT_NB = utils.CUSTOMERS_OUT_NB
 
 # Max timelaps that divide outages.
-SEPPARATION_HOURS = 18
+SEPARATION_HOURS = 18
 # Represents 15 minutes, in seconds
 MIN_OUTAGE_SECONDS = 60 * 15
 NB_15_MIN_IN_HOUR = 4
@@ -41,7 +41,7 @@ def get_outages_index(outages_county):
     outages_county['second_difference'] = outages_county.run_start_time.diff().dt.total_seconds()
     # Each time we find an interval mark greater than the separation time (defined in separation_hours),
     # we identify it as true (1), or false (0).
-    separation_hours_seconds = MIN_OUTAGE_SECONDS * NB_15_MIN_IN_HOUR * (SEPPARATION_HOURS)
+    separation_hours_seconds = MIN_OUTAGE_SECONDS * NB_15_MIN_IN_HOUR * (SEPARATION_HOURS)
     outages_county['interval_mark'] = (
             outages_county.second_difference.fillna(MIN_OUTAGE_SECONDS) >= separation_hours_seconds
     ).astype(int)

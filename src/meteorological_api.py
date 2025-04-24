@@ -22,7 +22,7 @@ API_CALLS_ON = False
 METEOROLOGICAL_API_KEY = 'METEOROLOGICAL_API_URL'
 config = utils.get_config_file()  # Bottleneck
 parameters = utils.get_parameters_file()  # Bottleneck
-RANDOM_SEED = config['RANDOM_SEED']
+RANDOM_SEED = utils.RANDOM_SEED
 ELEMENT_NB = 200
 SLEEP = 5
 
