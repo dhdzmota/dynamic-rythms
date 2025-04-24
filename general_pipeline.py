@@ -9,6 +9,8 @@ command_list = [
     # Generate datasets for model
     'python src/data_dataset_creation.py',
     'python src/feature_generation.py',
+    'python src/dataset_splitting.py',
+    'python src/training_model.py'
 
 ]
 
