@@ -5,3 +5,6 @@ __pycache__
 data/external/
 data/interim/
 data/raw/
+*.egg-info/
+*.parquet
+*.pkl
