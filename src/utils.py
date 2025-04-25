@@ -67,6 +67,20 @@ STATE_ABBREVIATIONS = {
     'United States Virgin Islands': 'VI'
 }
 
+SHAP_COLOR_PALLETE = (
+    '#008bfb',
+    '#007bf4',
+    '#3569e8',
+    '#6657d9',
+    '#8443c6',
+    '#a21eaa',
+    '#bc009f',
+    '#d6008e',
+    '#e9007d',
+    '#f80068',
+    '#ff0055',
+)
+
 SET_COLOR_DICT = {
     'train': '#f8cc62',
     'test': '#bba681',
@@ -82,16 +96,19 @@ def get_general_path():
     general_path = os.path.join(file_path, '..')
     return general_path
 
+
 def join_paths(*p1):
     """
     Helper function to join paths
     """
     return os.path.join(*p1)
 
+
 def check_if_filepath_exists(filepath):
     """Check if the corresponding path exists."""
     exists = os.path.exists(filepath)
     return exists
+
 
 def make_desired_folder(data_file_path):
     general_path = get_general_path()
@@ -101,11 +118,13 @@ def make_desired_folder(data_file_path):
         os.makedirs(file_path)
     return None
 
+
 def get_data_path(name):
     '''Obtain the relative path for the data folder'''
     general_path = get_general_path()
     file_path = join_paths(general_path, 'data', name)
     return file_path
+
 
 def save_dataframe(filepath, dataframe, file_format='parquet'):
     """ Saves dataframe into the desired path as the desired format.
@@ -123,6 +142,7 @@ def save_dataframe(filepath, dataframe, file_format='parquet'):
         dataframe.to_pickle(filepath)
     print(f'Data was saved into `{filepath}`.')
 
+
 def get_config_file():
     """Access the configuration file with the URL links"""
     general_path = get_general_path()
@@ -130,6 +150,7 @@ def get_config_file():
     with open(yaml_path) as f:
         config = yaml.safe_load(f)
     return config
+
 
 def get_model_hyperparameters():
     """Access de hyperparameters file."""
@@ -139,6 +160,7 @@ def get_model_hyperparameters():
         hyperparams = json.loads(f)
     return hyperparams
 
+
 def get_parameters_file():
     """Access the parameters file with the params definitions"""
     general_path = get_general_path()
@@ -146,10 +168,12 @@ def get_parameters_file():
     params = pd.read_csv(params_path, engine='python', header=1).head(20).to_dict()['Parameter(s):']
     return params
 
+
 def key_list(dictionary):
     """Get the keys of a dictionary as a list"""
     key_list_dict = list(dictionary.keys())
     return key_list_dict
+
 
 def save_json_from_url_zip(url, save_data_path, verbose=False):
     """From a URL, that downloads a zip file containing json files, download the info.
@@ -165,6 +189,7 @@ def save_json_from_url_zip(url, save_data_path, verbose=False):
                 print(f'Extracting {f} into {save_data_path}')
     print(f'Done with extraction into {save_data_path}.')
     return None
+
 
 def save_shapefile_from_url_zip(url, save_data_path):
     """From a URL, that downloads a zip file containing shp files, download the info and
@@ -191,6 +216,7 @@ def save_shapefile_from_url_zip(url, save_data_path):
     main_file = os.path.join(save_data_path, file_name)
     return main_file
 
+
 def save_info(main_file, filepath):
     "Read a main file shp dataframe and save it into a desired path"
     if not check_if_filepath_exists(filepath):
@@ -199,10 +225,12 @@ def save_info(main_file, filepath):
     else:
         print(f'Information is already saved at: {filepath}')
 
+
 def save_as_json(what, where):
     if not check_if_filepath_exists(where):
         with open(where, 'w') as f:
             json.dump(what, f)
+
 
 def save_as_pickle(what, where):
     if not check_if_filepath_exists(where):
@@ -214,6 +242,7 @@ def read_pickle(where):
     with open(where, 'rb') as f:
         loaded_file = pickle.load(f)
         return loaded_file
+
 
 def miniprocess_outage_raw_df(outages):
     print('Processing outages...')
@@ -230,6 +259,7 @@ def miniprocess_outage_raw_df(outages):
     outages["fips_code_id"] = outages.fips_code.astype(str).str.zfill(5)
     outages["sub_general_id"] = (outages.fips_code_id + '_' + outages.state_id)
     return outages
+
 
 def get_required_outages_dfs(*years, eaglei_data_path=None):
     eaglei_data_paths = os.listdir(eaglei_data_path)
@@ -253,6 +283,7 @@ def get_required_outages_dfs(*years, eaglei_data_path=None):
 
     return outages_df
 
+
 def save_pickle_model(model:any, file_name:str='outage_model.pkl')->None:
     """
     save a given model into a pickle file in the model folder
@@ -268,3 +299,8 @@ def save_pickle_model(model:any, file_name:str='outage_model.pkl')->None:
     model_path = join_paths(model_folder, file_name)
     with open(model_path, 'wb') as f:
         pickle.dump(model, f)
+
+
+def get_record_from_df(df, pos):
+    record = df.iloc[pos]
+    return record
