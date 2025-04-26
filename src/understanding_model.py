@@ -437,7 +437,18 @@ def plot_shap_importance_for_each_sample(samples):
         )
         plt.show()
 
-def shap_importance_for_each_sample():
-    x, info = get_final_datasets()
+def shap_importance_for_each_sample(x, info):
+    #x, info = get_final_datasets()
     samples = get_sample(info, x, sets=['OOT','test'])
     plot_shap_importance_for_each_sample(samples)
+    general_shap_summary(x, sets=['OOT', 'test'])
+
+def general_shap_summary(x, sets=['OOT', 'test']):
+    model = training_model.get_model()
+    explainer = shap.TreeExplainer(model)
+    for key in sets:
+        x_key = x[key]
+        shap_values = explainer.shap_values(x_key)
+        plt.title(f'Summary Shap Values for {key} set')
+        shap.summary_plot(shap_values, x_key)
+
