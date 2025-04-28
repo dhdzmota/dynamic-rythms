@@ -12,8 +12,6 @@ command_list = [
     'python src/dataset_splitting.py',
     # Model generation and explanation
     'python src/training_model.py',
-
-
 ]
 
 for command in command_list:
