@@ -397,12 +397,14 @@ def plot_shap_importance_for_each_sample(samples):
 
         # Plot text
         for element_top, element_low in zip(top5_text.index, low5_text.index):
+            val_top = round(sample_x_key.iloc[-1][element_top], 2)
             pos_y = top5_text.loc[element_top]
             text = element_top
-            ax.text(pos_x_top, pos_y, f' <-- {text}', ha='left', va='center')
+            ax.text(pos_x_top, pos_y, f' <-- {text}: ({val_top})', ha='left', va='center')
+            val_low = round(sample_x_key.iloc[0][element_low], 2)
             pos_y = low5_text.loc[element_low]
             text = element_low
-            ax.text(pos_x_low, pos_y, f'{text} --> ', ha='right', va='center')
+            ax.text(pos_x_low, pos_y, f'{text}: ({val_low}) --> ', ha='right', va='center')
         ax.plot(
             sample_info_key.meteorological_current_datetime_val,
             sample_info_key.pred,
@@ -421,7 +423,10 @@ def plot_shap_importance_for_each_sample(samples):
         )
         plt.xlim(additional_pos_x_low, additional_pos_x_top)
         plt.legend()
-        plt.title('Behaviour of the model score over time for a specific storm. With a representation of normalized feature importance changing over time.')
+        plt.title(
+            'Behaviour of the model score over time for a specific storm.'
+            ' With a representation of normalized feature importance changing over time.'
+        )
         plt.xlabel('Date')
         plt.ylabel('Model Score')
         plt.show()
@@ -438,10 +443,8 @@ def plot_shap_importance_for_each_sample(samples):
         plt.show()
 
 def shap_importance_for_each_sample(x, info):
-    #x, info = get_final_datasets()
     samples = get_sample(info, x, sets=['OOT','test'])
     plot_shap_importance_for_each_sample(samples)
-    general_shap_summary(x, sets=['OOT', 'test'])
 
 def general_shap_summary(x, sets=['OOT', 'test']):
     model = training_model.get_model()
@@ -452,3 +455,48 @@ def general_shap_summary(x, sets=['OOT', 'test']):
         plt.title(f'Summary Shap Values for {key} set')
         shap.summary_plot(shap_values, x_key)
 
+def plot_shap_dependence_plots(x, sets=['OOT', 'test'], nb_important_features=5):
+    model = training_model.get_model()
+    explainer = shap.TreeExplainer(model)
+    for key in sets:
+        x_key = x[key]
+        shap_values = explainer.shap_values(x_key)
+        top_inds = np.argsort(-np.sum(np.abs(shap_values), 0))
+        for i in range(nb_important_features):
+            shap.dependence_plot(top_inds[i], shap_values, x_key)
+
+
+def plot_score_distribution(info, sets=['OOT']):
+    for key in sets:
+        info_key = info[key]
+        fig, ax = plt.subplots(figsize=(20,10))
+        alpha_val = 0.4
+        ax.hist(info_key['pred'][info_key['y']==0], bins=100, color='blue', alpha=alpha_val)
+        ax2 = ax.twinx()
+        ax2.hist(info_key['pred'][info_key['y']==1], bins=100, color='orange', alpha=alpha_val)
+        plt.title(f'Score distribution for the positive class on the {key} set.')
+        plt.xlabel('Model score (bins)')
+        ax.set_ylabel('Count (negative class)')
+        ax2.set_ylabel('Count (positive class)')
+
+
+def plot_general_score_distribution_w_qs(info, sets=['OOT'], q_min=0, q_max=0):
+    for key in sets:
+        info_key = info[key]
+        fig, ax = plt.subplots(figsize=(20,10))
+        alpha_val = 0.2
+        y_hist, x_hist, plot_hist = ax.hist(info_key['pred'], bins=1000, density=True)
+        ax.vlines([q_min, q_max], 0, y_hist.max(), color='k', linestyle='--')
+        plt.fill_between(
+            [q_min, q_max],
+            y_hist.max(),
+            alpha=alpha_val,
+            color='r',
+            hatch='//',
+            label='Uncertainty area'
+        )
+        plt.title('Score distribution with the corresponding Uncertainty Area.')
+        plt.ylabel('Histogram Density')
+        plt.xlabel('Model score')
+        plt.legend()
+        plt.show()
