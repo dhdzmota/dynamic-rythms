@@ -208,6 +208,7 @@ def combining_outages_and_storms(storms_state_exploded, outages_index_resumed):
              'outage_duration',
              'run_start_time_min',
              'run_start_time_max',
+             'total_customers_out',
              ]
         ],
         how='left',

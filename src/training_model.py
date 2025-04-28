@@ -12,7 +12,7 @@ INTERIM_DATA_PATH = utils.get_data_path('interim')
 FINAL_DATA_PATH = utils.get_data_path('final')
 GENERAL_PATH = utils.get_general_path()
 MODEL_PATH = utils.join_paths(GENERAL_PATH, 'models')
-MODEL_FILENAME = utils.join_paths(MODEL_PATH, 'models.pkl')
+MODEL_FILENAME = utils.join_paths(MODEL_PATH, 'model.pkl')
 
 
 NO_FEATURE_COLS = [
@@ -21,6 +21,8 @@ NO_FEATURE_COLS = [
     'meteorological_current_datetime_val',
     'hours_to_outage',
     'outage_in_an_hour',
+    'storm_duration',
+    'total_customers_out',
 ]
 
 ADDITIONAL_INFO_COLUMNS = [
@@ -76,8 +78,10 @@ def save_x_y_info(x, info):
 
 
 def save_model(model):
+    print(f'Saving model at {MODEL_FILENAME}')
     with open(MODEL_FILENAME, "wb") as f:
         pickle.dump(model, f)
+    print('Done.')
 
 
 def get_model():

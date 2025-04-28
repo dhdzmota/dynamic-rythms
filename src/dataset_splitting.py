@@ -105,12 +105,12 @@ def train_test_cal_eval_splits(
     return datasets_fips_ids
 
 
-def get_datasets(data, datasets_fips_ids):
-    datasets = {
-        dataset_name: data[data.episode_fips_id.isin(dataset_fips_id)]
-        for dataset_name, dataset_fips_id in datasets_fips_ids.items()
-    }
-    return datasets
+def get_datasets(data, datasets_fips_ids, save=True):
+    for dataset_name, dataset_fips_id in datasets_fips_ids.items():
+        dataset = data[data.episode_fips_id.isin(dataset_fips_id)]
+        if save:
+            save_individual_dataset(name=dataset_name, data=dataset)
+
 
 
 def read_datasets():
@@ -137,24 +137,21 @@ def save_individual_dataset(name, data):
     data.to_parquet(filepath)
 
 
+
 def save_datasets(datasets):
     for name, data in datasets.items():
         save_individual_dataset(name, data)
 
 
-def splitting_process(save=True, return_data=False):
+def splitting_process():
     data, train_window_candidates, oot_window_candidates = (
         get_train_and_oot_candidates()
     )
     datasets_fips_ids = train_test_cal_eval_splits(
         train_window_candidates, oot_window_candidates
     )
-    datasets = get_datasets(data, datasets_fips_ids)
-    if save:
-        save_datasets(datasets)
-    if return_data:
-        return datasets
+    get_datasets(data, datasets_fips_ids)
 
 
 if __name__ == "__main__":
-    splitting_process(save=True, return_data=False)
+    splitting_process()

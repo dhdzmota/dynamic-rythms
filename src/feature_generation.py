@@ -31,6 +31,8 @@ class OutageFeatures:
             'coord0',
             'coord1',
             'coord2',
+            'total_customers_out',
+            'storm_duration',
         ]
         self.work_cols = [
             col for col in self.df.columns if col not in self.no_work_cols
@@ -45,6 +47,18 @@ class OutageFeatures:
         """
         self.df['diff_between_t10m_t2m'] = self.df['T10M'] - self.df['T2M']
         self.df['diff_between_t50m_t2m'] = self.df['WS50M'] - self.df['WS2M']
+        self.df['diff_between_ALLSKY_SFC_DWN_SW_LW'] = self.df['ALLSKY_SFC_SW_DWN'] - self.df['ALLSKY_SFC_LW_DWN']
+        self.df['diff_between_CLRSKY_SFC_DWN_SW_LW'] = self.df['CLRSKY_SFC_SW_DWN'] - self.df['CLRSKY_SFC_LW_DWN']
+        self.df['diff_between_CLRSKY_ALLSKY_SFC_LW_DWN'] = self.df['CLRSKY_SFC_LW_DWN'] - self.df['ALLSKY_SFC_LW_DWN']
+        self.df['diff_between_CLRSKY_ALLSKY_SFC_SW_DWN'] = self.df['CLRSKY_SFC_SW_DWN'] - self.df['ALLSKY_SFC_SW_DWN']
+        #self.work_cols += [
+        #    'diff_between_t10m_t2m',
+        #    'diff_between_t50m_t2m',
+        #    'diff_between_ALLSKY_SFC_DWN_SW_LW',
+        #    'diff_between_CLRSKY_SFC_DWN_SW_LW',
+        #    'diff_between_CLRSKY_ALLSKY_SFC_LW_DWN',
+        #    'diff_between_CLRSKY_ALLSKY_SFC_SW_DWN',
+        #]
 
     def get_feature_previous_n_hours(self, col: str, n: int) -> None:
         """For a given column, it generates a new column with the values for the previous n hours.

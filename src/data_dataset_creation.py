@@ -9,14 +9,13 @@ import os
 import pandas as pd
 import warnings
 
-
 HOURS_BEFORE_START = 10
-
 
 GENERAL_PATH = utils.get_general_path()
 RAW_DATA_PATH = utils.get_data_path('raw')
 INTERIM_DATA_PATH = utils.get_data_path('interim')
-METEOROLOGICAL_DATA_PATH = utils.join_paths(RAW_DATA_PATH, 'meteorological')
+EXTERNAL_DATA_PATH = utils.get_data_path('external')
+METEOROLOGICAL_DATA_PATH = utils.join_paths(EXTERNAL_DATA_PATH, 'meteorological')
 STORM_OUTAGES = utils.join_paths(INTERIM_DATA_PATH, 'storm_outages_2014_2023.parquet')
 METEOROLOGICAL_OUTAGES = utils.join_paths(INTERIM_DATA_PATH, 'meteorological_data_with_outages.parquet')
 
@@ -42,6 +41,7 @@ def process_storm_outages():
         outage_duration=('outage_duration', 'sum'),
         run_start_time_min=('run_start_time_min', 'min'),
         run_start_time_max=('run_start_time_max', 'max'),
+        total_customers_out=('total_customers_out', 'mean'),
     ).reset_index()
     return storm_outages_grouped
 
@@ -84,10 +84,13 @@ def get_data_with_response_variable(met_file, storm_outages_g):
         data['coord1'] = coord1
         data['coord2'] = coord2
         data['meteorological_nextHour_datetime_val'] = (
-                data['meteorological_current_datetime_val'] + pd.Timedelta(value=1, unit='hours')
+                data['meteorological_current_datetime_val'] +
+                pd.Timedelta(value=1, unit='hours')
         )
         # Get the response var dataframe
-        storm_outage_episode = storm_outages_g[storm_outages_g.episode_fips_id == episode_fips_id]
+        storm_outage_episode = storm_outages_g[
+            storm_outages_g.episode_fips_id == episode_fips_id
+        ]
         meaning_dict = {
             'begin_datetime': 'storm_start',
             'end_datetime': 'storm_end',
@@ -99,7 +102,9 @@ def get_data_with_response_variable(met_file, storm_outages_g):
             'episode_fips_id',
             'storm_start',
             'outage_start',
-            'outage_end'
+            'outage_end',
+            'storm_duration',
+            'total_customers_out',
         ]
         # Join information to get the data with response variable (data_rv)
         data_rv = data.merge(
@@ -108,15 +113,20 @@ def get_data_with_response_variable(met_file, storm_outages_g):
             how='left'
         )
         # We are looking for meteorological information before the outage beginnig.
-        data_rv = data_rv[data_rv.meteorological_current_datetime_val <= data_rv.outage_start]
+        data_rv = data_rv[
+            data_rv.meteorological_current_datetime_val <= data_rv.outage_start
+        ]
         # We will compute features 3 hours before the storm start.
-        hours_before_start = data_rv.storm_start - pd.Timedelta(value=HOURS_BEFORE_START, unit='hours')
+        hours_before_start = (
+                data_rv.storm_start - pd.Timedelta(value=HOURS_BEFORE_START, unit='hours')
+        )
         data_rv = data_rv[data_rv.meteorological_current_datetime_val >= hours_before_start]
 
         # We can compute the time it takes for a given meteorological condition's time to the outage
         data_rv['hours_to_outage'] = (
             data_rv.outage_start - data_rv.meteorological_current_datetime_val
         ).dt.total_seconds() / 3600
+
         # This is the target variable:
         # Will an outage happen in the next hour given the current meteorological conditions?
         data_rv['outage_in_an_hour'] = (data_rv['hours_to_outage'] <= 1).astype(int)
@@ -140,10 +150,16 @@ def create_outage_meteorological_dataset(save=True):
     data_with_response_variable = []
     print('Processing meteorological jsons data...')
     for met_file in meteorological_files:
-        dwrv = get_data_with_response_variable(met_file, storm_outages_g=storm_outages_grouped)
+        dwrv = get_data_with_response_variable(
+            met_file,
+            storm_outages_g=storm_outages_grouped
+        )
         data_with_response_variable.append(dwrv)
 
-    cleaned_data_wrv = [dwrv for dwrv in data_with_response_variable if dwrv is not None]
+    cleaned_data_wrv = [
+        dwrv for dwrv in data_with_response_variable
+        if dwrv is not None
+    ]
     outage_meteorological_dataset = pd.concat(cleaned_data_wrv)
     print('Done with process...')
     if save:
@@ -154,7 +170,9 @@ def create_outage_meteorological_dataset(save=True):
             'outage_end',
         ]
         print(f'Saving data at: {METEOROLOGICAL_OUTAGES}')
-        outage_meteorological_dataset.drop(dropcols, axis=1).to_parquet(METEOROLOGICAL_OUTAGES)
+        outage_meteorological_dataset.drop(
+            dropcols, axis=1
+        ).to_parquet(METEOROLOGICAL_OUTAGES)
 
     return outage_meteorological_dataset
 
@@ -182,7 +200,3 @@ def get_data():
         return data
     print('File does not exist, please compute it.')
     return None
-
-
-if __name__ == "__main__":
-    execute()
