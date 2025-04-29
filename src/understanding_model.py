@@ -42,7 +42,7 @@ mpl.rcParams['xtick.labelcolor'] = main_color
 mpl.rcParams['ytick.color'] = main_color
 mpl.rcParams['ytick.labelcolor'] = main_color
 
-DIFFERENCE_THRESHOLD = 0.96
+DIFFERENCE_THRESHOLD_QUANTILE = 0.96
 WRITTEN_FEATURES_NB = 6
 
 def shap_top_N_features(x, shap_explainer, N=10):
@@ -318,9 +318,14 @@ def get_sample(info, x, sets=['OOT']):
                 episode_fips_metrics['pred_last'] -
                 episode_fips_metrics['pred_first']
         )
+        quantile = episode_fips_metrics.difference__last_first.quantile(
+            DIFFERENCE_THRESHOLD_QUANTILE
+        )
         sample_index = episode_fips_metrics[
-            episode_fips_metrics.difference__last_first > DIFFERENCE_THRESHOLD
-        ].sample(1,random_state=RANDOM_SEED).index.to_list()
+            episode_fips_metrics.difference__last_first > quantile
+        ].sample(
+            1, random_state=RANDOM_SEED
+        ).index.to_list()
         sample_info_key = info_key[info_key.episode_fips_id.isin(sample_index)]
         sample_x_key = x[key].loc[sample_info_key.index]
 
