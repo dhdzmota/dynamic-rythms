@@ -4,6 +4,8 @@ import pickle
 from mapie.classification import MapieClassifier
 
 import src.utils as utils
+import src.training_model as training_model
+import src.understanding_model as understanding_model
 
 
 GENERAL_PATH = utils.get_general_path()
@@ -95,3 +97,12 @@ def get_certainty_quantiles_min_max(certainty_frame):
           'Change (lower) alpha in conformal prediction to get results.')
     return 0, 0
 
+def train_conformal_predictor():
+    model = training_model.get_model()
+    x, info = understanding_model.get_final_datasets()
+    mapie_clf = fit_mapie_classifier(model, x['cal'], info['cal']['y'])
+    mapie_results = get_predicted_labels_and_set(mapie_clf, x, alpha=0.05, sets=['OOT'])
+    info = integrate_certainty_into_info_df(info, mapie_results, sets=['OOT'])
+    certainty_frames = get_certainty_frame(info, sets=['OOT'])
+    q_min, q_max = get_certainty_quantiles_min_max(certainty_frames['OOT'])
+    understanding_model.plot_general_score_distribution_w_qs(info, sets=['test'], q_min=q_min, q_max=q_max)
