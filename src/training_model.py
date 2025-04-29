@@ -45,6 +45,7 @@ XGB_PARAMETERS = dict(
     colsample_bytree=0.75,
     early_stopping_rounds=25,
     gamma=1,
+    seed=RANDOM_SEED,
 )
 
 
