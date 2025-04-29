@@ -8,6 +8,8 @@ import yaml
 
 from io import BytesIO
 from zipfile import ZipFile
+from concurrent.futures import ThreadPoolExecutor
+
 
 RANDOM_SEED = 42
 CUSTOMERS_OUT_NB = 10**3.5 # 10**3.5
@@ -187,6 +189,26 @@ def save_json_from_url_zip(url, save_data_path, verbose=False):
             zip_file.extract(f, path=save_data_path)
             if verbose:
                 print(f'Extracting {f} into {save_data_path}')
+    print(f'Done with extraction into {save_data_path}.')
+    return None
+
+
+def save_json_from_url_zip_parallel(url, save_data_path, verbose=False):
+    """From a URL, that downloads a zip file containing json files, download the info with parallel extraction."""
+    print('Downloading info...')
+    req = urllib.request.Request(url, headers={'User-Agent': "Magic Browser"})
+    url_response = urllib.request.urlopen(req)
+    zip_file = ZipFile(BytesIO(url_response.read()))
+
+    def extract_file(f):
+        if f.endswith('.json'):
+            zip_file.extract(f, path=save_data_path)
+            if verbose:
+                print(f'Extracting {f} into {save_data_path}')
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        executor.map(extract_file, zip_file.namelist())
+
     print(f'Done with extraction into {save_data_path}.')
     return None
 

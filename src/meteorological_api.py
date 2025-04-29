@@ -30,7 +30,7 @@ GENERAL_PATH = utils.get_general_path()
 RAW_DATA_PATH = utils.get_data_path('raw')
 INTERIM_DATA_PATH = utils.get_data_path('interim')
 EXTERNAL_DATA_PATH = utils.get_data_path('external')
-METEOROLOGICAL_DATA_PATH = utils.join_paths(RAW_DATA_PATH, 'meteorological')
+METEOROLOGICAL_DATA_PATH = utils.join_paths(EXTERNAL_DATA_PATH, 'meteorological')
 STORM_OUTAGES = utils.join_paths(INTERIM_DATA_PATH, 'storm_outages_2014_2023.parquet')
 COUNTY_DATA_PATH = utils.join_paths(EXTERNAL_DATA_PATH, 'county.parquet')
 
@@ -178,7 +178,7 @@ def request_json_meteorological_files():
 def getting_downloadable_meteorological_folder():
     url = config[METEOROLOGICAL_DOWNLOADABLE_URL_KEY]
     print(f'Getting info from {url}...')
-    utils.save_json_from_url_zip(
+    utils.save_json_from_url_zip_parallel(
         url=url, save_data_path=EXTERNAL_DATA_PATH
     )
     return None
