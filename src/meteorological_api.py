@@ -66,6 +66,14 @@ def get_api_url(lat, lon, datetime_start, datetime_end, temporality='hourly'):
 
 
 def get_meteorological_info(url):
+    """
+    Retrieve and parse meteorological information from a given URL.
+
+    :param url: str
+        The URL pointing to the JSON-formatted meteorological data.
+    :return: formated_text_information: dict
+        Parsed JSON data as a Python dictionary.
+    """
     text_information = requests.get(url).text
     formated_text_information = json.loads(text_information)
     time.sleep(1)
@@ -73,10 +81,29 @@ def get_meteorological_info(url):
 
 
 def save_meteorological_information(information, path):
+    """
+    Save meteorological information as a JSON file at the specified path.
+
+    :param information: dict
+        The meteorological data to be saved.
+    :param path: str
+        The file path where the JSON will be stored.
+    :return: None
+    """
     utils.save_as_json(what=information, where=path)
 
 
 def get_url_params_from_row_point(storm_outage_row, desired_point=None):
+    """
+    Generate an API URL for meteorological data based on a row containing storm outage info.
+
+    :param storm_outage_row: pandas Series
+        A row from a DataFrame containing storm-related information, including geometry and time range.
+    :param desired_point: str, optional
+        The column name in the row containing the desired shapely Point (with .x and .y attributes).
+    :return: url or np.nan
+        URL string to request meteorological data, or np.nan if data already exists.
+    """
     lon = storm_outage_row[desired_point].x
     lat = storm_outage_row[desired_point].y
     start = storm_outage_row.one_day_before_storm
@@ -91,6 +118,14 @@ def get_url_params_from_row_point(storm_outage_row, desired_point=None):
 
 
 def save_meteorological_info_from_row_point(storm_outage_row_iterated):
+    """
+    Save meteorological information from a DataFrame row if it is valid and not already saved.
+
+    :param storm_outage_row_iterated: tuple
+        A tuple containing the index and a pandas Series representing a storm outage row with meteorological info.
+    :return: int or np.nan
+        Returns 1 if the file was saved, otherwise np.nan.
+    """
     idx, storm_outage_row = storm_outage_row_iterated
     identifier = storm_outage_row['episode_fips_id']
     meteorological_info = storm_outage_row['meteorological_info__cntroid']
@@ -105,6 +140,12 @@ def save_meteorological_info_from_row_point(storm_outage_row_iterated):
 
 
 def get_outage_storms():
+    """
+    Load storm outage data and filter for storms that caused an outage.
+
+    :return: outages_storms: pandas DataFrame
+        DataFrame containing only the storms where an outage occurred.
+    """
     storm_outages_info = pd.read_parquet(STORM_OUTAGES)
     # We keep only storms that caused an outage.
     outages_storms = storm_outages_info[storm_outages_info.storm_caused_outage == 1]
@@ -112,12 +153,32 @@ def get_outage_storms():
 
 
 def get_meteorological_storm_fips():
+    """
+    Retrieve the set of unique storm FIPS identifiers from stored meteorological data files.
+
+    :return: unique_meteorological_storm_fips: set
+        Set of filenames corresponding to stored meteorological data, representing storm FIPS identifiers.
+    """
     meteorological_files = os.listdir(METEOROLOGICAL_DATA_PATH)
     unique_meteorological_storm_fips = set(meteorological_files)
     return unique_meteorological_storm_fips
 
 
 def request_json_meteorological_files():
+    """
+    Download and save missing meteorological JSON files for storms that caused outages.
+
+    This function:
+      - Identifies which storm-related meteorological files are missing.
+      - Samples a subset of these storms (up to `ELEMENT_NB`) in each iteration.
+      - Computes relevant date ranges and geographic centroids.
+      - Builds URLs for API requests to fetch meteorological data.
+      - Uses multiprocessing to fetch data concurrently.
+      - Saves the JSON data to disk.
+      - Repeats until no new data is downloaded or a retry limit is reached.
+
+    :return: None
+    """
     counties = gpd.read_parquet(COUNTY_DATA_PATH)
     counties['fips_code_id'] = counties['STATEFP'] + counties['COUNTYFP']
     outages_storms = get_outage_storms()
@@ -176,6 +237,11 @@ def request_json_meteorological_files():
 
 
 def getting_downloadable_meteorological_folder():
+    """
+    Download and extract a folder of meteorological JSON files from a configured URL.
+
+    :return: None
+    """
     url = config[METEOROLOGICAL_DOWNLOADABLE_URL_KEY]
     print(f'Getting info from {url}...')
     utils.save_json_from_url_zip_parallel(
@@ -185,6 +251,15 @@ def getting_downloadable_meteorological_folder():
 
 
 def api_call_is_off():
+    """
+    Handle the case when API calls are disabled.
+
+    Prints warnings to the user and attempts to retrieve meteorological data
+    from an already uploaded file if it doesn't exist locally.
+
+    :return: meteorological_filepath_exists: bool
+        True if the meteorological data path exists, False otherwise.
+    """
     print(
         f'API calls are turned off. '
         f'If you know what you are doing, change the API_CALLS_ON parameter on the script. '
@@ -201,6 +276,14 @@ def api_call_is_off():
 
 
 def download_process():
+    """
+    Manage the meteorological data download process based on API call settings.
+
+    If API calls are turned off, it checks for existing data or attempts to download from a shared file.
+    If API calls are enabled, it triggers the process to request JSON files from the API.
+
+    :return: None
+    """
     if not API_CALLS_ON:
         api_call_is_off()
         return None
