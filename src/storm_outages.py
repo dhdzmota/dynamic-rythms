@@ -28,11 +28,21 @@ warnings.filterwarnings('ignore')
 
 
 def get_outages_index(outages_county):
-    ''' This function groups outages depending on their separation
+    """
+    Index outages into distinct events based on time separation and customer impact.
 
-    :param outages_county:
-    :return:
-    '''
+    This function:
+      - Sorts outage records by start time.
+      - Filters for outages affecting a minimum number of customers.
+      - Computes time gaps between outages.
+      - Uses a defined separation threshold to identify new outage events.
+      - Assigns a cumulative index to group outages into discrete events.
+
+    :param outages_county: pandas DataFrame
+        Outage records for a specific county, including `run_start_time` and `customers_out`.
+    :return: outages_county: pandas DataFrame
+        Updated DataFrame with a new column `outage_index` indicating event grouping.
+    """
     outages_county = outages_county.sort_values("run_start_time")
     # Then we keep only the relevant outage (affecting a high amount of customers)
     outages_county = outages_county[outages_county.customers_out >= CUSTOMERS_OUT_NB]
@@ -51,10 +61,20 @@ def get_outages_index(outages_county):
 
 
 def process_outages(outages):
-    """ Function that process outages information, creating an outage_index_resumed dataframe.
+    """
+    Process outage records to create indexed outage events and summarize their characteristics.
 
-    :param outages:
-    :return:
+    This function:
+      - Groups outage data by `sub_general_id` and applies a custom indexing function.
+      - Assigns a unique `outage_index_id` based on location and temporal segmentation.
+      - Aggregates relevant statistics for each indexed outage event.
+      - Computes outage duration and intensity (customers affected per day).
+      - Normalizes state names for consistency.
+
+    :param outages: pandas DataFrame
+        Raw outage records with fields like `run_start_time`, `customers_out`, `fips_code_id`, etc.
+    :return: outages_index_resumed: pandas DataFrame
+        Aggregated and cleaned outage data indexed by unique outage events.
     """
     # Get the corresponding index.
     outages_index = outages.groupby('sub_general_id').apply(get_outages_index)
@@ -92,11 +112,21 @@ def process_outages(outages):
 
 
 def process_storm_events(storm_events):
-    ''' Function that processess the storm events by grouping them and finally yielding storm episodes by county.
+    """
+    Process raw storm events DataFrame to generate structured storm episode records by FIPS code.
 
-    :param storm_events:
-    :return:
-    '''
+    This function:
+      - Converts raw date and time fields into datetime objects.
+      - Computes storm durations in hours.
+      - Aggregates storm events into episodes by EPISODE_ID.
+      - Explodes the FIPS code list to allow per-county analysis.
+      - Generates a unique identifier `episode_fips_id` for each storm-county combination.
+
+    :param storm_events: pandas DataFrame
+        Raw storm events data containing temporal fields and location identifiers.
+    :return: storms_state_exploded: pandas DataFrame
+        DataFrame containing one row per storm episode per FIPS code, including timing and description data.
+    """
     begin_datetime = (
         storm_events['BEGIN_YEARMONTH'].astype(str) +
         storm_events['BEGIN_DAY'].astype(str).str.zfill(2) +
@@ -158,6 +188,17 @@ def process_storm_events(storm_events):
 
 
 def combining_outages_and_storms(storms_state_exploded, outages_index_resumed):
+    """
+    Combine storm and outage datasets and compute whether a storm caused an outage based on temporal conditions.
+
+    :param storms_state_exploded: pandas DataFrame
+        DataFrame containing storm event data with FIPS identifiers and timestamps.
+    :param outages_index_resumed: pandas DataFrame
+        DataFrame containing indexed outage information, including start and end times.
+    :return: storms_with_response_var: pandas DataFrame
+        Merged DataFrame with an added binary column `storm_caused_outage` indicating if the outage
+        can be attributed to a storm, along with additional computed time difference features.
+    """
     storms_outages = storms_state_exploded.merge(
         outages_index_resumed,
         on='fips_code_id',
@@ -219,6 +260,18 @@ def combining_outages_and_storms(storms_state_exploded, outages_index_resumed):
 
 
 def create_storm_caused_outage():
+    """
+    Create and save a dataset that identifies whether a storm caused a power outage.
+
+    This function:
+      - Loads storm event and outage data.
+      - Processes outages and storm data separately.
+      - Merges both datasets based on temporal and spatial logic.
+      - Computes the target variable (`storm_caused_outage`) using defined conditions.
+      - Saves the resulting dataset to a Parquet file.
+
+    :return: None
+    """
     # Read data
     storm_events = pd.read_csv(STORM_EVENTS_CLEANED_PATH)
     outages = utils.get_required_outages_dfs(
@@ -242,6 +295,11 @@ def create_storm_caused_outage():
 
 
 def execute():
+    """
+    Execute the pipeline to create the storm-caused outage dataset if it doesn't already exist.
+
+    :return: None
+    """
     if not utils.check_if_filepath_exists(STORM_OUTAGES):
         create_storm_caused_outage()
     else:
