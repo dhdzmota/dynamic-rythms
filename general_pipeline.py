@@ -12,6 +12,7 @@ command_list = [
     'python src/dataset_splitting.py',
     # Model generation and explanation
     'python src/training_model.py',
+    'python src/conformal_predictions.py'
 ]
 
 for command in command_list:
