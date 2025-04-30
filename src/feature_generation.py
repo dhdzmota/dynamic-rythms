@@ -124,6 +124,16 @@ class OutageFeatures:
 
 
 def compute_features(save=True, return_df=False):
+    """
+    Compute engineered features from the input dataset and optionally save or return them.
+
+    :param save: bool, optional
+        Whether to save the computed features to disk. Default is True.
+    :param return_df: bool, optional
+        Whether to return the resulting DataFrame. Default is False.
+    :return: data_features: pandas DataFrame (optional)
+        The computed feature set, only returned if `return_df` is True.
+    """
     data = data_dataset_creation.get_data()
     print('Computing the features...')
     outage_features = OutageFeatures(data=data)
