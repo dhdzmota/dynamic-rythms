@@ -69,7 +69,6 @@ Depending on your machine and internet speed, this may take some time.
 ## License
 This project is licensed under the [MIT License](./LICENSE).  
 
-## Contributors
+## Contributor
 
 - [Daniel Hernández Mota](https://github.com/dhdzmota)
-- [Kim Alejandro Mora Trujillo](https://github.com/Kim-Mora)

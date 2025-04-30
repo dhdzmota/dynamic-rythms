@@ -50,9 +50,9 @@ def word_similarity(w1, w2):
 
 
 def fix_fips_codes():
-    '''Function that makes corrections in the storm_events fips by
+    """Function that makes corrections in the storm_events fips by
     reading the information in official county data.
-    '''
+    """
     # Read data
     county = gpd.read_parquet(COUNTY_DATA_PATH)
     storm_events = pd.read_csv(STORM_EVENTS_PATH)
@@ -134,6 +134,14 @@ def fix_fips_codes():
 
 
 def execute():
+    """
+    Executes the preprocessing pipeline for storm events data.
+
+    If the cleaned storm events file does not exist, it triggers the `fix_fips_codes`
+    function to generate it. Otherwise, it informs the user that the file already exists.
+
+    :return: None
+    """
     if not utils.check_if_filepath_exists(STORM_EVENTS_CLEANED_PATH):
         fix_fips_codes()
     else:
