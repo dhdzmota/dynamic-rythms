@@ -50,11 +50,30 @@ XGB_PARAMETERS = dict(
 
 
 def read_splitted_data():
+    """
+    Load and return the previously split datasets for training, calibration, and testing.
+
+    :return: datasets: dict
+        Dictionary containing split datasets, typically including keys like 'train', 'cal', 'test', and 'OOT'.
+    """
     datasets = dataset_splitting.read_datasets()
     return datasets
 
 
 def get_datasets_x_y_info(datasets):
+    """
+    Split each dataset into features (X), target variable (y), and additional information.
+
+    :param datasets: dict
+        Dictionary of datasets with keys like 'train', 'cal', 'test', etc., each containing a DataFrame.
+    :return: x, y, info: tuple of dicts
+        x: dict
+            Feature matrices with non-feature columns dropped.
+        y: dict
+            Target labels (`outage_in_an_hour`) for each dataset split.
+        info: dict
+            Additional information columns retained from each dataset.
+    """
     x = {}
     y = {}
     info = {}
@@ -66,6 +85,15 @@ def get_datasets_x_y_info(datasets):
 
 
 def save_x_y_info(x, info):
+    """
+    Save feature matrices and corresponding metadata for each dataset split.
+
+    :param x: dict
+        Dictionary containing feature DataFrames (X) for each dataset split.
+    :param info: dict
+        Dictionary containing metadata DataFrames (e.g., target, additional info) for each split.
+    :return: None
+    """
     for key in x.keys():
         x_path = utils.join_paths(FINAL_DATA_PATH, f'x_{key}.parquet')
         i_path = utils.join_paths(FINAL_DATA_PATH, f'i_{key}.parquet')
@@ -79,6 +107,13 @@ def save_x_y_info(x, info):
 
 
 def save_model(model):
+    """
+    Save a trained model object to disk using pickle.
+
+    :param model: object
+        Trained model to be saved.
+    :return: None
+    """
     print(f'Saving model at {MODEL_FILENAME}')
     with open(MODEL_FILENAME, "wb") as f:
         pickle.dump(model, f)
@@ -86,17 +121,43 @@ def save_model(model):
 
 
 def get_model():
+    """
+    Load a trained model object from disk using pickle.
+
+    :return: load_model: object
+        The loaded model.
+    """
     with open(MODEL_FILENAME, 'rb') as f:
         load_model = pickle.load(f)
     return load_model
 
 
 def model_score(model, X):
+    """
+    Compute prediction scores (probabilities for the positive class) using a trained model.
+
+    :param model: object
+        Trained classification model with a `predict_proba` method.
+    :param X: array-like or pandas DataFrame
+        Feature data to score.
+    :return: score: numpy array
+        Array of predicted probabilities for the positive class.
+    """
     score = model.predict_proba(X)[:, 1]
     return score
 
 
 def train_model(force=False, save_data=False):
+    """
+    Train an XGBoost classifier on the prepared training data, and optionally save the model and data.
+
+    :param force: bool, optional
+        If True, retrains the model even if a saved model already exists. Default is False.
+    :param save_data: bool, optional
+        If True, saves the feature sets and prediction info after training. Default is False.
+    :return: model: XGBClassifier
+        The trained XGBoost classification model.
+    """
     if not utils.check_if_filepath_exists(MODEL_FILENAME) or force:
         # Read data
         datasets = read_splitted_data()
