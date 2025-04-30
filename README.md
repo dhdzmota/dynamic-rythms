@@ -39,7 +39,6 @@ dynamic-rythms/
 │   └── model.pkl                         # Main classification model
 │
 ├── notebooks/                            # Jupyter notebooks for development and EDA
-│   └── model_pipeline.ipynb              # Full model development pipeline
 │
 ├── src/                                  # Source code for the project (flat module structure)
 │   ├── __init__.py
@@ -56,7 +55,9 @@ dynamic-rythms/
 │   ├── understanding_model.py
 │   └── utils.py
 │
-├── general_pipeline                     # Script to orchestrate the whole pipeline
+├── model_pipeline.ipynb                 # Main and most important file. Contains the model pipeline. 
+├── model_pipeline.html                  # Freezed pipeline file, explaining results, etc. 
+├── general_pipeline.py                  # Script to orchestrate the whole pipeline
 ├── .gitignore                           # Git version control exclusions
 ├── LICENSE                              # License file (e.g., MIT, Apache)
 ├── README.md                            # Project overview and instructions
