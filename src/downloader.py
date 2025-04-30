@@ -17,6 +17,11 @@ COUNTY_DATA_PATH = utils.join_paths(EXTERNAL_DATA_PATH, 'county.parquet')
 
 
 def download_cities():
+    """
+    Download and save shapefile data for cities from a configured URL.
+
+    :return: None
+    """
     config = utils.get_config_file()
     url = config[CITY_URL_KEY]
     main_file = utils.save_shapefile_from_url_zip(
@@ -27,6 +32,11 @@ def download_cities():
 
 
 def download_counties():
+    """
+    Download and save shapefile data for counties from a configured URL.
+
+    :return: None
+    """
     config = utils.get_config_file()
     url = config[COUNTY_URL_KEY]
     main_file = utils.save_shapefile_from_url_zip(
@@ -37,8 +47,14 @@ def download_counties():
 
 
 def download():
+    """
+    Trigger the download process for required geographic data files.
+
+    Currently calls the function to download county-level shapefiles.
+
+    :return: None
+    """
     download_counties()
-    pass
 
 
 if __name__ == "__main__":
