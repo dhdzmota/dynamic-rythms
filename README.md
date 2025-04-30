@@ -1,17 +1,69 @@
 #  Project Summary: dynamic-rythms
 
-This is a repo developed to solve the _Dynamic Rhythms Contest_, focused on predicting power outage caused by weather 
-events, specially storms.
+A project developed to participate in the **Dynamic Rhythms Contest**, focused on predicting power outages caused by 
+severe weather events, particularly storms.
+
 ![](assets/images/dynamic-rhythms.png)
 
 ## Objective: 
-Develop a model that can forecast power outages in advance based on historical and real-time meteorological data. 
-The goal is to enable early, accurate, and geospatially precise predictions that support proactive energy system responses.
+Develop a machine learning model that can forecast power outages in advance using historical and real-time meteorological data. 
+The goal is to enable early, accurate, and geospatially precise predictions to support proactive responses in energy systems.
 
+This project contributes to the advancement of rare-event forecasting and supports the development of more sustainable and resilient infrastructure.
 
-## Outcome: 
-By participating, this project will contribute to the advancement of rare-event forecasting and support the development
-of more sustainable and resilient energy systems through improved outage prediction.
+## Project structure: 
+```
+dynamic-rythms/
+├── assets/                               # Visual and media assets
+│   ├── images/                           # Icons, logos, and UI visuals
+│   └── time-organization/                # Time-based diagrams or organization figures
+│
+├── config/                               # Configuration and parameter files
+│   ├── config.yaml                       # Global config definitions
+│   ├── model_params.json                 # Model hyperparameters
+│   └── POWER_Parameter_Manager.xlsx      # External parameter manager spreadsheet
+│
+├── data/                                 # Structured data lifecycle
+│   ├── external/                         # Third-party raw data
+│   ├── final/                            # Cleaned data ready for modeling
+│   ├── temp_results/                     # Temporary analysis outputs
+│   ├── interim/                          # Intermediate transformed data
+│   └── raw/                              # Immutable raw source data
+│       └── dynamic-rhythms-train-data/   # Contest-provided data
+│           └── data/
+│               ├── eaglei_data/
+│               └── NOAA_StormEvents/
+│
+├── models/                               # Trained model artifacts
+│   ├── conformal_model.pkl               # Conformal prediction model
+│   └── model.pkl                         # Main classification model
+│
+├── notebooks/                            # Jupyter notebooks for development and EDA
+│   └── model_pipeline.ipynb              # Full model development pipeline
+│
+├── src/                                  # Source code for the project (flat module structure)
+│   ├── __init__.py
+│   ├── cleaner.py
+│   ├── conformal_predictions.py
+│   ├── data_dataset_creation.py
+│   ├── dataset_splitting.py
+│   ├── downloader.py
+│   ├── feature_generation.py
+│   ├── meteorological_api.py
+│   ├── model_metrics.py
+│   ├── storm_outages.py
+│   ├── training_model.py
+│   ├── understanding_model.py
+│   └── utils.py
+│
+├── general_pipeline                     # Script to orchestrate the whole pipeline
+├── .gitignore                           # Git version control exclusions
+├── LICENSE                              # License file (e.g., MIT, Apache)
+├── README.md                            # Project overview and instructions
+├── requirements.txt                     # Python dependencies
+└── setup.py                             # Installation script (if packaging as module)
+```
+
 ---
 
 ## Steps to Run This Project
@@ -54,12 +106,8 @@ From the project root, install the required packages: `pip install -r requiremen
 
 
 ### 4. Run the Pipeline
-You can choose between running the notebook or using the script:
-- Option A: Use Jupyter Notebook
+Use Jupyter Notebook
   - Open and run the notebook `model_pipeline.ipynb` cell by cell. This will download external data, generate features, train the model and evaluate it.
-- Option B: Run the Pipeline script
-  - Alternative you can run the entire pipeline via script `python general_pipeline.py`. This will perform all the steps except for model evaluation.
-Once it completes, you can open the notebook at step 4 to inspect the results or continue evaluating.
 
  ### 5. Sit back and let it run
 The pipeline will process the data, build features, train the model, and provide outputs.
